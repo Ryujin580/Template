@@ -1,10 +1,84 @@
-<div style="font-family:Segoe UI, sans-serif; font-size:14px; color:#000000; line-height:1.6; padding:20px;">
-  <p>Gentile [Nome],</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>Template Inserter</title>
 
-  <p>
-    [Scrivi qui il contenuto dell’email aziendale...]
-  </p>
+    <!-- 1. Riferimento alla libreria JavaScript di Office. È obbligatorio. -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
 
-  <p>Cordiali saluti,<br>
-  [Il tuo nome]</p>
-</div>
+    <style>
+        /* Stile semplice per rendere il pannello più pulito */
+        body {
+            font-family: Segoe UI, sans-serif;
+            font-size: 14px;
+            padding: 15px;
+            background-color: #f3f2f1;
+        }
+        button {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        .template-preview {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <h3>Template Aziendale</h3>
+    <p>Clicca il pulsante per inserire il template nel corpo della mail.</p>
+    
+    <!-- 2. Pulsante per attivare l'inserimento -->
+    <button id="insertButton">Inserisci Template</button>
+
+    <div class="template-preview">
+        <h4>Anteprima:</h4>
+        <div id="template-content" style="font-family:Segoe UI, sans-serif; font-size:14px; color:#000000; line-height:1.6;">
+            <p>Gentile [Nome],</p>
+            <p>
+              [Scrivi qui il contenuto dell’email aziendale...]
+            </p>
+            <p>Cordiali saluti,<br>
+            [Il tuo nome]</p>
+        </div>
+    </div>
+
+    <script>
+        // 3. Logica JavaScript per l'add-in
+        Office.onReady(function(info) {
+            // Controlla se l'host è Outlook
+            if (info.host === Office.HostType.Outlook) {
+                document.getElementById("insertButton").onclick = insertTemplate;
+            }
+        });
+
+        function insertTemplate() {
+            // Prende l'HTML dall'elemento di anteprima
+            const templateHtml = document.getElementById("template-content").innerHTML;
+
+            // Usa l'API di Office per inserire l'HTML nel corpo della mail
+            // L'opzione 'coercionType' dice a Outlook di trattare la stringa come HTML
+            Office.context.mailbox.item.body.setSelectedDataAsync(templateHtml, { coercionType: Office.CoercionType.Html }, function(asyncResult) {
+                if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+                    console.error("Errore nell'inserimento del template: " + asyncResult.error.message);
+                } else {
+                    console.log("Template inserito con successo!");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
